@@ -6,7 +6,7 @@ using UDR.Game.Exceptions;
 
 namespace UDR.Game
 {
-    public abstract class CardCollection : IEnumerable<GameCard>
+    public class CardCollection : IEnumerable<GameCard>
     {
         protected List<GameCard> cards;
         protected bool _isSorted = false;
@@ -22,23 +22,53 @@ namespace UDR.Game
             cards = new List<GameCard>();
         }
 
-        protected virtual void AddCard(GameCard card)
+        public int Count => cards.Count;
+
+        public GameCard GetCard(int idx) => cards[idx];
+
+        internal void Shuffle()
+        {
+            var random = new System.Random((int)System.DateTime.Now.Ticks);
+            var interations = cards.Count * 10;
+            while (--interations > 0)
+            {
+                var card = cards[random.Next(cards.Count)];
+                RemoveCard(card);
+                AddCard(card, random.Next(cards.Count));
+            }   
+        }
+
+        internal virtual void AddCard(GameCard card, int idx = -1)
         {
             if (card == null)
                 throw new ArgumentNullException(nameof(card));
             if (cards.Contains(card))
                 throw new CardTransferException("Card already exists in collection", card);
-            cards.Add(card);
+            if (idx < 0)
+                cards.Add(card);
+            else
+                cards.Insert(idx, card);
             if (_isSorted) cards.Sort(_comparator);
         }
 
-        protected virtual void RemoveCard(GameCard card)
+        internal virtual void RemoveCard(GameCard card)
         {
             if (card == null)
                 throw new ArgumentNullException(nameof(card));
             if (!cards.Contains(card))
                 throw new CardTransferException("Card does not exist in collection", card);
             cards.Remove(card);
+        }
+
+        internal virtual void TransferTo(CardCollection cardCollection, int number = -1)
+        {
+            int count = number == -1 ? cards.Count : number;
+            while (count-- > 0)
+            {
+                var card = cards[0];
+                RemoveCard(card);
+                cardCollection.AddCard(card);
+            }
         }
 
         #region IEnumerable

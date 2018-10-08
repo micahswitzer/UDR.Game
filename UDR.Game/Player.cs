@@ -2,11 +2,11 @@
 {
     public abstract class Player
     {
-        protected CardCollection Hand { get; private set; }
+        internal CardCollection Hand { get; set; }
 
         public Player()
         {
-            Hand = new CardCollection()
+            Hand = new CardCollection();
         }
     }
 }
