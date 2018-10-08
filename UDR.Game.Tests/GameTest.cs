@@ -31,7 +31,7 @@ namespace UDR.Game.Tests
         public void SetPlayers_Throws_TooFewPlayers()
         {
             var myPlayers = new[] { new TestPlayer() };
-            Assert.Throws(typeof(ArgumentException),
+            Assert.Throws<ArgumentException>(
                 () => Game.SetPlayers(myPlayers));
             Assert.Null(Game.Players);
         }
@@ -39,7 +39,7 @@ namespace UDR.Game.Tests
         [Fact]
         public void SetPlayers_Throws_NullParameter()
         {
-            Assert.Throws(typeof(ArgumentNullException),
+            Assert.Throws<ArgumentNullException>(
                 () => Game.SetPlayers(null));
         }
 
@@ -49,7 +49,7 @@ namespace UDR.Game.Tests
             var myPlayers = new[] { new TestPlayer(), new TestPlayer() };
             Game.SetPlayers(myPlayers);
             Assert.Equal(myPlayers, Game.Players);
-            Assert.Throws(typeof(InvalidGameStateException),
+            Assert.Throws<InvalidGameStateException>(
                 () => Game.SetPlayers(myPlayers));
         }
 
@@ -60,8 +60,15 @@ namespace UDR.Game.Tests
             Game.SetPlayers(myPlayers);
             Assert.Equal(myPlayers, Game.Players);
             Game.StartGame();
-            Assert.Throws(typeof(InvalidGameStateException),
+            Assert.Throws<InvalidGameStateException>(
                 () => Game.SetPlayers(myPlayers));
+        }
+
+        [Fact]
+        public void StartGame_Throws_NoPlayers()
+        {
+            Assert.Throws<InvalidGameStateException>(
+                () => Game.StartGame());
         }
     }
 }
