@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDR.Game", "UDR.Game\UDR.Ga
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDR.Game.Tests", "UDR.Game.Tests\UDR.Game.Tests.csproj", "{E018767D-F60C-4999-89A8-D06361F70FEA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDR.Game.Cli", "UDR.Game.Cli\UDR.Game.Cli.csproj", "{416E5F47-4894-471C-A79D-17CD17814E59}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{E018767D-F60C-4999-89A8-D06361F70FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E018767D-F60C-4999-89A8-D06361F70FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E018767D-F60C-4999-89A8-D06361F70FEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{416E5F47-4894-471C-A79D-17CD17814E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{416E5F47-4894-471C-A79D-17CD17814E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{416E5F47-4894-471C-A79D-17CD17814E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{416E5F47-4894-471C-A79D-17CD17814E59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

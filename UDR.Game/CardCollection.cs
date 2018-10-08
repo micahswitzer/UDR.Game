@@ -13,13 +13,17 @@ namespace UDR.Game
 
         private GameCardComparator _comparator = new GameCardComparator();
 
-        public CardCollection(List<GameCard> cards)
+        public CardCollection(List<GameCard> cards, bool sorted = true)
         {
             this.cards = cards;
+            _isSorted = sorted;
+            if (_isSorted)
+                this.cards.Sort(_comparator);
         }
-        public CardCollection()
+        public CardCollection(bool sorted = true)
         {
             cards = new List<GameCard>();
+            _isSorted = sorted;
         }
 
         public int Count => cards.Count;
@@ -62,7 +66,7 @@ namespace UDR.Game
 
         internal virtual void TransferTo(CardCollection cardCollection, int number = -1)
         {
-            int count = number == -1 ? cards.Count : number;
+            int count = (number == -1 ? cards.Count : number);
             while (count-- > 0)
             {
                 var card = cards[0];
