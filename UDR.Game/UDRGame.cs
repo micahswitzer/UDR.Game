@@ -31,7 +31,8 @@ namespace UDR.Game
             if (Players != null) // we must only be able to set the players exactly once
                 throw new InvalidGameStateException("The players have already been set");
             // we want to make a copy of the list
-            Players = players.ToList();
+            Players = players.Select(x => x is null ?
+                throw new ArgumentException("Players cannot be null", nameof(players)) : x).ToList();
             // check if we have a valid number of players
             if (Players.Count >= 2) return; // return here to avoid nesting
             // reset the players variable if we don't
@@ -103,6 +104,8 @@ namespace UDR.Game
 
         protected void AdvanceRound()
         {
+            // some cool logic to make sure everyone has player their turn
+            CollectCards(); // why does this method even exist?
             
         }
     }

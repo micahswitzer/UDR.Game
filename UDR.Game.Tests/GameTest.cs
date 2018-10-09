@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UDR.Game.Exceptions;
 using Xunit;
 
@@ -13,6 +14,14 @@ namespace UDR.Game.Tests
             Game = new UDRGame();
         }
 
+        private IEnumerable<Player> SetPlayersAndAssert()
+        {
+            var myPlayers = new[] { new TestPlayer(), new TestPlayer() };
+            Game.SetPlayers(myPlayers);
+            Assert.Equal(myPlayers, Game.Players);
+            return myPlayers;
+        }
+
         [Fact]
         public void GameSate_NotStarted_AfterConstructed()
         {
@@ -22,9 +31,7 @@ namespace UDR.Game.Tests
         [Fact]
         public void SetPlayers_Allowed_FirstTime()
         {
-            var myPlayers = new[] { new TestPlayer(), new TestPlayer() };
-            Game.SetPlayers(myPlayers);
-            Assert.Equal(myPlayers, Game.Players);
+            SetPlayersAndAssert();
         }
 
         [Fact]
@@ -44,11 +51,18 @@ namespace UDR.Game.Tests
         }
 
         [Fact]
+        public void SetPlayers_Throws_NullPlayer() 
+        {
+            var myPlayers = new[] { new TestPlayer(), (Player)null };
+            Assert.Throws<ArgumentException>(
+                () => Game.SetPlayers(myPlayers));
+            Assert.Null(Game.Players);
+        }
+
+        [Fact]
         public void SetPlayers_Throws_CalledTwice()
         {
-            var myPlayers = new[] { new TestPlayer(), new TestPlayer() };
-            Game.SetPlayers(myPlayers);
-            Assert.Equal(myPlayers, Game.Players);
+            var myPlayers = SetPlayersAndAssert();
             Assert.Throws<InvalidGameStateException>(
                 () => Game.SetPlayers(myPlayers));
         }
@@ -56,9 +70,7 @@ namespace UDR.Game.Tests
         [Fact]
         public void SetPlayers_Throws_AfterStart() 
         {
-            var myPlayers = new[] { new TestPlayer(), new TestPlayer() };
-            Game.SetPlayers(myPlayers);
-            Assert.Equal(myPlayers, Game.Players);
+            var myPlayers = SetPlayersAndAssert();
             Game.StartGame();
             Assert.Throws<InvalidGameStateException>(
                 () => Game.SetPlayers(myPlayers));
@@ -69,6 +81,22 @@ namespace UDR.Game.Tests
         {
             Assert.Throws<InvalidGameStateException>(
                 () => Game.StartGame());
+        }
+
+        [Fact]
+        public void StartGame_InProgress_AfterRun()
+        {
+            SetPlayersAndAssert();
+            Game.StartGame();
+            Assert.Equal(GameState.InProgress, Game.GameState);
+        }
+
+        [Fact]
+        public void StartGame_RoundOne_AfterRun()
+        {
+            SetPlayersAndAssert();
+            Game.StartGame();
+            Assert.Equal(1, Game.RoundNumber);
         }
     }
 }

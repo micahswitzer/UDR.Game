@@ -12,5 +12,10 @@ namespace UDR.Game
             Rank = rank;
             Suit = suit;
         }
+
+        public override string ToString()
+        {
+            return string.Concat(Rank, ' ', Suit);
+        }
     }
 }

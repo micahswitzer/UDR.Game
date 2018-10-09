@@ -13,14 +13,14 @@ namespace UDR.Game
 
         private GameCardComparator _comparator = new GameCardComparator();
 
-        public CardCollection(List<GameCard> cards, bool sorted = true)
+        public CardCollection(List<GameCard> cards, bool sorted = false)
         {
             this.cards = cards;
             _isSorted = sorted;
             if (_isSorted)
                 this.cards.Sort(_comparator);
         }
-        public CardCollection(bool sorted = true)
+        public CardCollection(bool sorted = false)
         {
             cards = new List<GameCard>();
             _isSorted = sorted;
@@ -33,12 +33,13 @@ namespace UDR.Game
         internal void Shuffle()
         {
             var random = new System.Random((int)System.DateTime.Now.Ticks);
-            var interations = cards.Count * 10;
-            while (--interations > 0)
+            var iterations = cards.Count * 10;
+            while (--iterations > 0)
             {
                 var card = cards[random.Next(cards.Count)];
+                Console.WriteLine($"Choosing {card}");
                 RemoveCard(card);
-                AddCard(card, random.Next(cards.Count));
+                AddCard(card); //, random.Next(cards.Count));
             }   
         }
 
