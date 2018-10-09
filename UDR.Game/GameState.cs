@@ -3,7 +3,8 @@ namespace UDR.Game
     public enum GameState
     {
         NotStarted,
-        InProgress,
+        PlacingBids,
+        PlayingCards,
         Ended
     }    
 }

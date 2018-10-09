@@ -33,13 +33,13 @@ namespace UDR.Game
         internal void Shuffle()
         {
             var random = new System.Random((int)System.DateTime.Now.Ticks);
-            var iterations = cards.Count * 10;
+            var iterations = cards.Count * 5;
             while (--iterations > 0)
             {
                 var card = cards[random.Next(cards.Count)];
                 Console.WriteLine($"Choosing {card}");
                 RemoveCard(card);
-                AddCard(card); //, random.Next(cards.Count));
+                AddCard(card);
             }   
         }
 

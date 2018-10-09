@@ -25,5 +25,10 @@ namespace UDR.Game
         {
             Hand = new CardCollection();
         }
+
+        protected void PlaceBid(int bid)
+        {
+            Game.PlaceBid(this, bid);
+        }
     }
 }

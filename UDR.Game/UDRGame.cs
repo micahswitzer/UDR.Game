@@ -20,6 +20,11 @@ namespace UDR.Game
             !CanPlayersSeeOwnCards;
         public GameState GameState { get; protected set; } = GameState.NotStarted;
 
+        private Dictionary<int, Dictionary<Player, int>> _roundPlayerBids;
+        public IReadOnlyDictionary<Player, int> CurrentPlayerBids => RoundNumber > 0 ?
+            _roundPlayerBids[RoundNumber] :
+            throw new InvalidGameStateException("No round is currently in progress");
+
         private SemaphoreSlim _semaphore = new SemaphoreSlim(1);
 
         public void SetPlayers(IEnumerable<Player> players)
@@ -57,7 +62,6 @@ namespace UDR.Game
             BuildDeck();
             Deck.Shuffle();
             RoundNumber = 1;
-            GameState = GameState.InProgress;
             DealRound();
             //_semaphore.Release();
         }
@@ -82,17 +86,12 @@ namespace UDR.Game
         /// </summary>
         protected void DealRound()
         {
-            if (GameState != GameState.InProgress)
-                throw new InvalidGameStateException("Game must be in progress to deal a round");
             for (int i = CardsPerPlayer; i > 0; --i)
-            {
                 foreach (var player in Players)
-                {
                     Deck.TransferTo(player.Hand, 1);
-                }
-            }
             TrumpCard = Deck.GetCard(0);
             Deck.RemoveCard(TrumpCard);
+            GameState = GameState.PlacingBids;
         }
 
         protected void BuildDeck()
@@ -107,9 +106,28 @@ namespace UDR.Game
 
         protected void AdvanceRound()
         {
-            // some cool logic to make sure everyone has player their turn
+            // some cool logic to make sure everyone has played their turn
             CollectCards(); // why does this method even exist?
             
+        }
+
+        internal void PlaceBid(Player player, int bid)
+        {
+            if (GameState != GameState.PlacingBids)
+                throw new InvalidGameStateException("Placing bids is not allowed at this time.");
+            if (!Players.Contains(player))
+                throw new ArgumentException("Player is not present in player collection.", nameof(player));
+            var playerBids = _roundPlayerBids[RoundNumber];
+            if (playerBids.ContainsKey(player))
+                throw new InvalidGameStateException("This player has already placed a bid.");
+            if (bid < 0 || bid > CardsPerPlayer)
+                throw new ArgumentException(
+                    "Invalid value for bid. The bid must be non-negative and " +
+                    "less than or equal to the number of cards per player.", nameof(bid));
+            playerBids[player] = bid;
+            if (playerBids.Count == Players.Count) // all players have placed bids
+                // TODO: notify players of new game state
+                GameState = GameState.PlayingCards;
         }
     }
 }

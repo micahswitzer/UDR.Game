@@ -96,7 +96,7 @@ namespace UDR.Game.Tests
         {
             SetPlayersAndAssert();
             Game.StartGame();
-            Assert.Equal(GameState.InProgress, Game.GameState);
+            Assert.Equal(GameState.PlacingBids, Game.GameState);
         }
 
         [Fact]
