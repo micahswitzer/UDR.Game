@@ -21,11 +21,20 @@ namespace UDR.Game
         public GameState GameState { get; protected set; } = GameState.NotStarted;
 
         private Dictionary<int, Dictionary<Player, int>> _roundPlayerBids;
-        public IReadOnlyDictionary<Player, int> CurrentPlayerBids => RoundNumber > 0 ?
+        public IReadOnlyDictionary<Player, int> CurrentPlayerBids =>
+            GameState == GameState.PlayingCards ?
             _roundPlayerBids[RoundNumber] :
             throw new InvalidGameStateException("No round is currently in progress");
 
-        private SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+        private SemaphoreSlim _semaphore;
+
+        public UDRGame()
+        {
+            _semaphore = new SemaphoreSlim(1);
+            _roundPlayerBids = new Dictionary<int, Dictionary<Player, int>>();
+            for (int i = 1; i <= 14; i++)
+                _roundPlayerBids.Add(i, new Dictionary<Player, int>());
+        }
 
         public void SetPlayers(IEnumerable<Player> players)
         {

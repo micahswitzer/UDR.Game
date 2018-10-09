@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UDR.Game.Exceptions;
 using Xunit;
 
@@ -105,6 +106,55 @@ namespace UDR.Game.Tests
             SetPlayersAndAssert();
             Game.StartGame();
             Assert.Equal(1, Game.RoundNumber);
+        }
+
+        [Fact]
+        public void PlaceBid_Works_FirstTime()
+        {
+            SetPlayersAndAssert();
+            Game.StartGame();
+            foreach (var player in Game.Players)
+                Game.PlaceBid(player, 1);
+            foreach (var kvp in Game.CurrentPlayerBids)
+                Assert.Equal(1, kvp.Value);
+        }
+
+        [Fact]
+        public void PlaceBid_Throws_DoubleBid()
+        {
+            SetPlayersAndAssert();
+            Game.StartGame();
+            Game.PlaceBid(Game.Players.First(), 1);
+            Assert.Throws<InvalidGameStateException>(
+                () => Game.PlaceBid(Game.Players.First(), 2));
+        }
+
+        [Fact]
+        public void PlaceBid_Throws_BeforeGameStart()
+        {
+            SetPlayersAndAssert();
+            Assert.Throws<InvalidGameStateException>(
+                () => Game.PlaceBid(Game.Players.First(), 1));
+        }
+
+        [Fact]
+        public void PlaceBid_Throws_InvalidBid()
+        {
+            SetPlayersAndAssert();
+            Game.StartGame();
+            Assert.Throws<ArgumentException>(
+                () => Game.PlaceBid(Game.Players.First(), -1));
+            Assert.Throws<ArgumentException>(
+                () => Game.PlaceBid(Game.Players.First(), Game.RoundNumber + 1));
+        }
+
+        [Fact]
+        public void PlaceBid_Throws_BadPlayer()
+        {
+            SetPlayersAndAssert();
+            Game.StartGame();
+            Assert.Throws<ArgumentException>(
+                () => Game.PlaceBid(new TestPlayer(), 1));
         }
     }
 }
