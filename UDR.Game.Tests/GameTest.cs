@@ -35,6 +35,14 @@ namespace UDR.Game.Tests
         }
 
         [Fact]
+        public void SetPlayers_PlayersHaveGameObject_Always()
+        {
+            SetPlayersAndAssert();
+            foreach (var player in Game.Players)
+                Assert.Same(Game, player.Game);
+        }
+
+        [Fact]
         public void SetPlayers_Throws_TooFewPlayers()
         {
             var myPlayers = new[] { new TestPlayer() };

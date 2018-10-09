@@ -31,8 +31,11 @@ namespace UDR.Game
             if (Players != null) // we must only be able to set the players exactly once
                 throw new InvalidGameStateException("The players have already been set");
             // we want to make a copy of the list
-            Players = players.Select(x => x is null ?
-                throw new ArgumentException("Players cannot be null", nameof(players)) : x).ToList();
+            Players = players.Select(x => x is null ? // check if the instance is null
+                // throw an exception if it is
+                throw new ArgumentException("Players cannot be null", nameof(players)) :
+                // otherwise set the game object and build a list
+                x.SetGame(this)).ToList();
             // check if we have a valid number of players
             if (Players.Count >= 2) return; // return here to avoid nesting
             // reset the players variable if we don't
