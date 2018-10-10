@@ -11,14 +11,14 @@ namespace UDR.Game
         protected List<GameCard> cards;
         protected bool _isSorted = false;
 
-        private GameCardComparator _comparator = new GameCardComparator();
+        protected IComparer<Card> Comparator = new GameCardComparator();
 
         public CardCollection(List<GameCard> cards, bool sorted = false)
         {
             this.cards = cards;
             _isSorted = sorted;
             if (_isSorted)
-                this.cards.Sort(_comparator);
+                this.cards.Sort(Comparator);
         }
         public CardCollection(bool sorted = false)
         {
@@ -53,7 +53,7 @@ namespace UDR.Game
                 cards.Add(card);
             else
                 cards.Insert(idx, card);
-            if (_isSorted) cards.Sort(_comparator);
+            if (_isSorted) cards.Sort(Comparator);
         }
 
         internal virtual void RemoveCard(GameCard card)
@@ -89,9 +89,9 @@ namespace UDR.Game
         }
         #endregion
 
-        private class GameCardComparator : IComparer<GameCard>
+        private class GameCardComparator : IComparer<Card>
         {
-            public int Compare(GameCard x, GameCard y)
+            public int Compare(Card x, Card y)
             {
                 if (x.Suit != y.Suit)
                     return (x.Suit > y.Suit) ? 1 : -1;

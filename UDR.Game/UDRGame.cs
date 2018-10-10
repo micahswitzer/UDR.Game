@@ -9,8 +9,10 @@ namespace UDR.Game
 {
     public class UDRGame
     {
-        public IReadOnlyList<Player> Players { get; protected set; }
-        internal CardCollection Deck { get; set; }
+        protected List<Player> _players;
+        public IReadOnlyList<Player> Players => _players;
+        internal CardCollection Deck { get; private set; }
+        internal CardCollection Table { get; private set; }
         public GameCard TrumpCard { get; protected set; }
         public int RoundNumber { get; protected set; }
         public int CardsPerPlayer =>
@@ -19,12 +21,15 @@ namespace UDR.Game
         public bool CanPlayersSeeOthersCards =>
             !CanPlayersSeeOwnCards;
         public GameState GameState { get; protected set; } = GameState.NotStarted;
+        public Player PlayerTurn { get; protected set; }
 
         private Dictionary<int, Dictionary<Player, int>> _roundPlayerBids;
         public IReadOnlyDictionary<Player, int> CurrentPlayerBids =>
             GameState == GameState.PlayingCards ?
             _roundPlayerBids[RoundNumber] :
             throw new InvalidGameStateException("No round is currently in progress");
+
+        private Dictionary<int, Dictionary<Player, int>> _roundPlayerTricksTaken;
 
         private SemaphoreSlim _semaphore;
 
@@ -34,6 +39,7 @@ namespace UDR.Game
             _roundPlayerBids = new Dictionary<int, Dictionary<Player, int>>();
             for (int i = 1; i <= 14; i++)
                 _roundPlayerBids.Add(i, new Dictionary<Player, int>());
+            Table = new CardCollection()
         }
 
         public void SetPlayers(IEnumerable<Player> players)
@@ -45,7 +51,7 @@ namespace UDR.Game
             if (Players != null) // we must only be able to set the players exactly once
                 throw new InvalidGameStateException("The players have already been set");
             // we want to make a copy of the list
-            Players = players.Select(x => x is null ? // check if the instance is null
+            _players = players.Select(x => x is null ? // check if the instance is null
                 // throw an exception if it is
                 throw new ArgumentException("Players cannot be null", nameof(players)) :
                 // otherwise set the game object and build a list
@@ -53,7 +59,7 @@ namespace UDR.Game
             // check if we have a valid number of players
             if (Players.Count >= 2) return; // return here to avoid nesting
             // reset the players variable if we don't
-            Players = null;
+            _players = null;
             throw new ArgumentException("There must be at least 2 players", nameof(players));
         }
 
@@ -137,6 +143,35 @@ namespace UDR.Game
             if (playerBids.Count == Players.Count) // all players have placed bids
                 // TODO: notify players of new game state
                 GameState = GameState.PlayingCards;
+        }
+
+        protected void AdvancePlayer()
+        {
+            if (_playsLeftInTrick-- == 0)
+                AdvanceTrick();
+            else
+                _currentPlayer = (_currentPlayer + 1) % Players.Count;
+        }
+
+        public int TricksRemaining { get; protected set; }
+        int _playsLeftInTrick;
+        int _currentPlayer = 0;
+        private Player _lastTrickTakenBy = null;
+        protected void AdvanceTrick()
+        {
+            if (TricksRemaining-- == 0)
+                AdvanceRound();
+            else
+                _currentPlayer = _players.IndexOf(_lastTrickTakenBy);
+        }
+
+        internal void PlayCard(Player player, GameCard card)
+        {
+            if (GameState != GameState.PlayingCards)
+                throw new InvalidGameStateException("Cards may not be played");
+            if (_players.IndexOf(player) != _currentPlayer)
+                throw new InvalidGameStateException("It is not this player's turn");
+
         }
     }
 }
